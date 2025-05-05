@@ -6,6 +6,8 @@ let handPose;
 let hands = [];
 let isInsideCircle = false; // 用於追蹤手指是否在圓內
 let previousX, previousY; // 儲存手指的上一個位置
+let centerX, centerY; // 圓心的全域變數
+const circleRadius = 50; // 圓的半徑
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -27,6 +29,10 @@ function setup() {
 
   // Start detecting hands
   handPose.detectStart(video, gotHands);
+
+  // 初始化圓心位置
+  centerX = width / 2;
+  centerY = height / 2;
 }
 
 function draw() {
@@ -52,10 +58,6 @@ function draw() {
         }
 
         // 畫布中心的圓
-        let centerX = width / 2;
-        let centerY = height / 2;
-        let circleRadius = 50; // 半徑為 50，直徑為 100
-
         fill(0, 255, 0, 100); // 半透明綠色
         noStroke();
         ellipse(centerX, centerY, circleRadius * 2, circleRadius * 2);
@@ -76,7 +78,7 @@ function draw() {
             previousX = indexFinger.x;
             previousY = indexFinger.y;
 
-            // 移動圓心到手指位置
+            // 更新圓心位置為手指位置
             centerX = indexFinger.x;
             centerY = indexFinger.y;
           } else {
