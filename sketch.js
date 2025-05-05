@@ -34,7 +34,7 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Loop through keypoints and draw circles
+        // Draw keypoints
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
@@ -48,6 +48,38 @@ function draw() {
           noStroke();
           circle(keypoint.x, keypoint.y, 16);
         }
+
+        // Connect keypoints 0 to 4 with lines
+        noFill();
+        strokeWeight(2);
+        if (hand.handedness == "Left") {
+          stroke(255, 0, 255); // Left hand color
+        } else {
+          stroke(255, 255, 0); // Right hand color
+        }
+
+        beginShape();
+        for (let i = 0; i <= 4; i++) { // 修正條件
+          let keypoint = hand.keypoints[i];
+          vertex(keypoint.x, keypoint.y);
+        }
+        for (let i = 5; i <= 8; i++) { // 修正條件
+          let keypoint = hand.keypoints[i];
+          vertex(keypoint.x, keypoint.y);
+        }
+        for (let i = 9; i <= 12; i++) { // 修正條件
+          let keypoint = hand.keypoints[i];
+          vertex(keypoint.x, keypoint.y);
+        }
+        for (let i = 13; i <= 16; i++) { // 修正條件
+          let keypoint = hand.keypoints[i];
+          vertex(keypoint.x, keypoint.y);
+        }
+        for (let i = 17; i <= 20; i++) { // 修正條件
+          let keypoint = hand.keypoints[i];
+          vertex(keypoint.x, keypoint.y);
+        }
+        endShape();
       }
     }
   }
