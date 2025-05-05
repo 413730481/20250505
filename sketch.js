@@ -33,9 +33,13 @@ function setup() {
   // 初始化圓心位置
   centerX = width / 2;
   centerY = height / 2;
+
+  // 保留畫布內容
+  background(255); // 設定白色背景
 }
 
 function draw() {
+  // 不清除畫布，保留之前的軌跡
   image(video, 0, 0);
 
   // 繪製手部檢測結果
