@@ -4,6 +4,8 @@
 let video;
 let handPose;
 let hands = [];
+let isInsideCircle = false; // 用於追蹤手指是否在圓內
+let previousX, previousY; // 儲存手指的上一個位置
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -30,15 +32,15 @@ function setup() {
 function draw() {
   image(video, 0, 0);
 
-  // Ensure at least one hand is detected
+  // 繪製手部檢測結果
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Draw keypoints
+        // 繪製關鍵點
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
-          // Color-code based on left or right hand
+          // 根據左右手設定顏色
           if (hand.handedness == "Left") {
             fill(255, 0, 255);
           } else {
@@ -49,37 +51,39 @@ function draw() {
           circle(keypoint.x, keypoint.y, 16);
         }
 
-        // Connect keypoints 0 to 4 with lines
-        noFill();
-        strokeWeight(2);
-        if (hand.handedness == "Left") {
-          stroke(255, 0, 255); // Left hand color
-        } else {
-          stroke(255, 255, 0); // Right hand color
-        }
+        // 畫布中心的圓
+        let centerX = width / 2;
+        let centerY = height / 2;
+        let circleRadius = 50; // 半徑為 50，直徑為 100
 
-        beginShape();
-        for (let i = 0; i <= 4; i++) { // 修正條件
-          let keypoint = hand.keypoints[i];
-          vertex(keypoint.x, keypoint.y);
+        fill(0, 255, 0, 100); // 半透明綠色
+        noStroke();
+        ellipse(centerX, centerY, circleRadius * 2, circleRadius * 2);
+
+        // 檢查手指是否在圓內
+        if (hand.keypoints.length > 8) {
+          let indexFinger = hand.keypoints[8];
+          let distance = dist(indexFinger.x, indexFinger.y, centerX, centerY);
+
+          if (distance <= circleRadius) {
+            // 手指在圓內，開始畫軌跡
+            if (isInsideCircle) {
+              stroke(255, 0, 0); // 紅色線條
+              strokeWeight(10); // 將線條粗細改為 10
+              line(previousX, previousY, indexFinger.x, indexFinger.y);
+            }
+            isInsideCircle = true;
+            previousX = indexFinger.x;
+            previousY = indexFinger.y;
+
+            // 移動圓心到手指位置
+            centerX = indexFinger.x;
+            centerY = indexFinger.y;
+          } else {
+            // 手指離開圓，停止畫軌跡
+            isInsideCircle = false;
+          }
         }
-        for (let i = 5; i <= 8; i++) { // 修正條件
-          let keypoint = hand.keypoints[i];
-          vertex(keypoint.x, keypoint.y);
-        }
-        for (let i = 9; i <= 12; i++) { // 修正條件
-          let keypoint = hand.keypoints[i];
-          vertex(keypoint.x, keypoint.y);
-        }
-        for (let i = 13; i <= 16; i++) { // 修正條件
-          let keypoint = hand.keypoints[i];
-          vertex(keypoint.x, keypoint.y);
-        }
-        for (let i = 17; i <= 20; i++) { // 修正條件
-          let keypoint = hand.keypoints[i];
-          vertex(keypoint.x, keypoint.y);
-        }
-        endShape();
       }
     }
   }
